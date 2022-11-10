@@ -27,13 +27,12 @@ int main (int argc, char **argv) {
 	int maxPossible = 0;
 	printf("Profondeur d'image souhaitée\n");
 	scanf("%d", &profondeurBits);
-	maxPossible = pow(2, profondeurBits) - 1;
-	printf("%d", maxPossible);
+	maxPossible = pow(2, profondeurBits);
 
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
-			tableau[i][j] = 2;
-			printf("%d", tableau[i][j]);
+			tableau[i][j] = rand() % maxPossible;
+			printf("%d\t", tableau[i][j]);
 		}
 		printf("\n");
 	}
