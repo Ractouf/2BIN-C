@@ -10,13 +10,13 @@ int main (int argc, char *argv[]) {
 		exit(1);
 	}
 
-	for (int i = 1; i < argc; i++) {
-		tableauChar[i] = malloc(strlen(argv[i]) * sizeof(char));	
+	for (int i = 0; i < argc - 1; i++) {
+		tableauChar[i] = malloc((strlen(argv[i]) + 1) * sizeof(char));	
 	}
 
-	for (int i = 1; i < argc; i++) {
-		for (int j = 0; j < strlen(argv[i]); j++) {
-			tableauChar[i][j] = toupper(argv[i][j]);
+	for (int i = 0; i < argc - 1; i++) {
+		for (int j = 0; j < strlen(argv[i + 1]); j++) {
+			tableauChar[i][j] = toupper(argv[i + 1][j]);
 			printf("%c", tableauChar[i][j]);
 		}
 		printf(" ");
@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
 
 	printf("\n");
 
-	for (int i = 0; i < argc; i++) {
+	for (int i = 0; i < argc - 1; i++) {
 		free(tableauChar[i]);
 	}
 
