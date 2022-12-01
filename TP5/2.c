@@ -45,3 +45,4 @@ int main (int argc, char *argv[]) {
 
     printf("nombre de mots trouvés : %d\n", nombreTrouve);
 }
+
