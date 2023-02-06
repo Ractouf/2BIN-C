@@ -18,33 +18,7 @@ static char square[8][8] ={
 static char* cryptCarrePolybe(char* msg) {
 	int size = strlen(msg);
 
-	char* tab = malloc(size* 2 * sizeof(char));
-	if (tab == NULL) {
-		perror("ça a pas marché");
-		exit(1);
-	}
-
-	int sizetab = 0;
-	
-	for (int k = 0; k < size; k++) {
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (square[i][j] == msg[k]) {
-					tab[sizetab] = i;
-					tab[sizetab + 1] = j;
-					sizetab += 2;
-					continue;
-				}
-			}
-		}
-	}
-	return tab;
-}
-
-static char* decryptCarrePolybe(char* msg) {
-	int size = strlen(msg);
-
-	char* tab = malloc(size* 2 * sizeof(char));
+	int* tab = malloc(size* 2 * sizeof(int));
 	if (tab == NULL) {
 		perror("ça a pas marché");
 		exit(1);
