@@ -5,7 +5,6 @@
 
 #include "crypt.h"
 
-
 static char* rot13(char* msg) {
    int sz = strlen(msg);
 
