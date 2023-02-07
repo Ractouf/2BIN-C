@@ -3,9 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "crypt.h"
-
-static char square[8][8] ={
+static char square[8][8] = {
 	{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'},
 	{'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'},
 	{'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X'},
