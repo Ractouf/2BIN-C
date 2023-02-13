@@ -38,7 +38,7 @@ cryptPolybe.o : cryptPolybe.c
 utils_v1.o : utils_v1.c
 	cc $(CFLAGS) -c utils_v1.c
 
-
+# Clean
 clean :
 	rm *.o
 	rm encrypt
