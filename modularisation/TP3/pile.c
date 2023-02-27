@@ -1,5 +1,5 @@
-#include <stdio.c>
-#include <stdlib.c>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include "pile.h"
@@ -12,19 +12,23 @@ bool pileVide (Pile pile) {
 	return pile == NULL;
 }
 
-bool push (Pile* pile, int i) {
-	SousPile* sousPile = (SousPile) malloc(sizeof(SousPile));
+bool push (Pile *pile, int i) {
+	SousPile* sousPile = (SousPile*) malloc(sizeof(SousPile));
+	if (sousPile == NULL) {
+		return false;
+	}
 
-	sousPile->suivant = pile;
+	sousPile->suivant = *pile;
 	sousPile->val = i;
+	return true;
 }
 
-int pop (Pile* pile) {
+int pop (Pile *pile) {
 	if (pileVide(*pile))
-		return NULL;
+		return -1;
 
-	elementRetire = pile;
-	pile = pile.suivant;
+	Pile elementRetire = *pile;
+	*pile = (*pile)->suivant;
 
 	int element = elementRetire->val;
 
@@ -40,10 +44,8 @@ void viderPile (Pile* pile) {
 }
 
 void afficherPile (Pile pile) {
-	SousPile baladeur = pile;
-
-	while (baladeur != NULL) {
-		printf("%d\n", baladeur->val);
-		baladeur = baladeur.suivant;
+	while (pile != NULL) {
+		printf("%d\n", pile->val);
+		pile = pile->suivant;
 	}
 }
