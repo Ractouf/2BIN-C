@@ -6,9 +6,10 @@
 	#define TITRE 128
 	#define AUTEUR 80
 	#define EDITEUR 50
+	#define MAX_LIGNE_LIVRE (TITRE + AUTEUR + EDITEUR + 50)
 
 	enum Genre {
-		BD, PO, TH, RO, RH, LF, LE, SC, IN, SF, SA, HI
+		BD, PO, TH, RO, RH, LF, LE, SC, IN, SF, SA, HI, GENRES_NUM
 	};
 
 	struct Livre {
@@ -25,5 +26,5 @@
 	char* genre2str(enum Genre genre);
 	char* livre2str(char* s, struct Livre livre);
 	void afficherBib(const struct Livre* livres, int sz);
-	bool ajouterLivre(struct Livre** bib, struct Livre livre, int* szl, int* szp);
+	bool ajouterLivre(struct Livre** bib, struct Livre livre, int *nbreL, int *taille);
 #endif
