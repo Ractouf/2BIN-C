@@ -85,3 +85,22 @@ bool ajouterLivre (struct Livre **bib, struct Livre l, int *nbreL, int *taille) 
 	(*nbreL)++;
 	return true;
 }
+
+bool lireFichier(FILE* file, struct Livre** bib, int* nbreL, int* taille) {
+	struct Livre tmp[BUF_SIZE];
+	int lu = BUF_SIZE;
+
+	while(lu == BUF_SIZE) {
+		lu = fread(tmp, sizeof(struct Livre), BUF_SIZE, file);
+		
+		for (int i = 0; i < lu; i++) {
+			ajouterLivre(bib, tmp[i], nbreL, taille);
+		}
+	}
+
+	return feof(file);
+}
+
+bool ecrireFichier(FILE* file, struct Livre* bib, int taille) {
+	return fwrite(bib, sizeof(struct Livre), taille, file) != BUF_SIZE;
+}

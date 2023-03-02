@@ -1,4 +1,4 @@
-CFLAGS=-std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE -g
+CFLAGS=-std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
 
 # Biblio
 schtroumph : testBiblio.o biblio.o utils_v1.o

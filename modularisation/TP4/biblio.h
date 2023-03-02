@@ -27,4 +27,6 @@
 	char* livre2str(char* s, struct Livre livre);
 	void afficherBib(const struct Livre* livres, int sz);
 	bool ajouterLivre(struct Livre** bib, struct Livre livre, int* nbreL, int* taille);
+	bool lireFichier(FILE* file, struct Livre** bib, int* nbreL, int* taille);
+	bool ecrireFichier(FILE* file, struct Livre* bib, int taille);
 #endif

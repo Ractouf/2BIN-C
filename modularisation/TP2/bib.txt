@@ -1,0 +1,35 @@
+Tintin au congo
+Herge
+1234567
+Casterman
+1967
+Bande dessinée
+
+La guerre des etoiles
+Lucas
+234
+YY
+1989
+Science-fiction
+
+La Bible
+Dieu
+1
+Du Ciel
+45
+Roman historique
+
+LangageC
+Legrand
+999999
+Vinci
+2017
+Informatique
+
+Les Cathares
+Anonyme
+4
+Seuil
+1999
+Roman historique
+
