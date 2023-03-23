@@ -1,5 +1,3 @@
-/* Envoi d'un signal SUGUSR1 du processus père à son fils */
-
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +15,9 @@ void sigusr1_handler (int sig) {
 	const size_t sz = strlen(HELLO);
 	write(1, HELLO, sz);
 
+	char* signal = "Signal SIGUSR1 reçu !\n";
+	write(1, signal, strlen(signal));
+
 	end = 1;
 }
 
@@ -24,6 +25,7 @@ void child_handler () {
 	pid_t pid = getpid();
 	pid_t ppid = getppid();
 	printf("Je suis le processus %d, fils de %d\n", pid, ppid);
+
 	while (end == 0) {
 		sleep(1);
 	}
