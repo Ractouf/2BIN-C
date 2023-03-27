@@ -1,11 +1,11 @@
 CFLAGS=-std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
 
 # Schtroumph
-schtroumph : alex.o utils_v2.o
-	gcc $(CFLAGS) -o schtroumph alex.o utils_v2.o
+schtroumph : maev.o utils_v2.o
+	gcc $(CFLAGS) -o schtroumph maev.o utils_v2.o
 
-alex.o : alex.c utils_v2.o 
-	gcc $(CFLAGS) -c alex.c
+maev.o : maev.c utils_v2.o 
+	gcc $(CFLAGS) -c maev.c
 
 # Utils
 utils_v2.o : utils_v2.c utils_v2.h
