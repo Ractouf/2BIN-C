@@ -1,5 +1,5 @@
-#ifndef _ZOMBIEH
-#define _ZOMBIEH
+#ifndef _LABOH
+#define _LABOH
 
 #define NBR_PORTS 10
 
