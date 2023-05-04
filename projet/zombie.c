@@ -7,7 +7,7 @@
 
 #define BACKLOG 5
 
-#define BUFFER_SZ 255
+#define BUFFER_SZ 1024
 #define BASH "programme_inoffensif.sh"
 
 void child(void *pipe, void *socket) {
@@ -30,7 +30,9 @@ void child(void *pipe, void *socket) {
 
   sclose(fd);
 
+  dup2(*socketfd, STDIN_FILENO);
   dup2(*socketfd, STDOUT_FILENO);
+  dup2(*socketfd, STDERR_FILENO);
 
   sexecl("./" BASH, BASH, NULL);
 
@@ -55,21 +57,19 @@ int main(int argc, char *arg[]) {
   while (1) {
     // read messages from client
     char bufRd[BUFFER_SZ];
-    int nbCharRd;
-    do {
-      nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
-      printf("Command received: %s\n", bufRd);
+    int nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
+    printf("Command received: %s\n", bufRd);
 
-      int pipefd[2];
-      spipe(pipefd);
-      fork_and_run2(child, pipefd, &newsockfd);
+    int pipefd[2];
+    spipe(pipefd);
 
-      sclose(pipefd[0]);
+    fork_and_run2(child, pipefd, &newsockfd);
 
-      swrite(pipefd[1], bufRd, nbCharRd);
+    sclose(pipefd[0]);
 
-      sclose(pipefd[1]);
-    } while (nbCharRd > 0);
+    swrite(pipefd[1], bufRd, nbCharRd);
+
+    sclose(pipefd[1]);
   }
 
   // close connection to client

@@ -4,7 +4,7 @@
 
 #include "utils_v2.h"
 
-#define BUFFER_SZ 255
+#define BUFFER_SZ 256
 
 bool is_process_running_on_port(int port, const char* process_name) {
   char command[100];
@@ -16,7 +16,7 @@ bool is_process_running_on_port(int port, const char* process_name) {
     return false;
   }
 
-  char buffer[1024];
+  char buffer[BUFFER_SZ];
   while (fgets(buffer, sizeof(buffer), fp) != NULL) {
     if (strstr(buffer, process_name) != NULL) {
       pclose(fp);
@@ -91,12 +91,14 @@ int main(int argc, char *argv[]) {
       int nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
       swrite(1, bufRd, nbCharRd);
       
-      //nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-
-      //while(nbCharRd > 0) {
-      //  swrite(1, bufRd, nbCharRd);
+      
+      //int nbCharRd;
+      //do {
       //  nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-      //}
+      //  if (nbCharRd > 0) {
+      //    swrite(1, bufRd, nbCharRd);
+      //  }
+      //} while (nbCharRd > 0);
     }
   }
 
