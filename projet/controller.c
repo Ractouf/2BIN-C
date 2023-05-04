@@ -3,12 +3,13 @@
 #include <stdbool.h>
 
 #include "utils_v2.h"
+#include "controller.h"
 
 #define BUFFER_SZ 256
 
-bool is_process_running_on_port(int port, const char* process_name) {
+bool is_process_running_on_port(int port) {
   char command[100];
-  snprintf(command, sizeof(command), "ss -nlp | grep -w %d | grep -w %s", port, process_name);
+  snprintf(command, sizeof(command), "ss -nlp | grep -w %d | grep -w %s", port, PROCESS);
 
   FILE* fp = popen(command, "r");
   if (fp == NULL) {
@@ -18,7 +19,7 @@ bool is_process_running_on_port(int port, const char* process_name) {
 
   char buffer[BUFFER_SZ];
   while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-    if (strstr(buffer, process_name) != NULL) {
+    if (strstr(buffer, PROCESS) != NULL) {
       pclose(fp);
       return true;
     }
@@ -29,6 +30,25 @@ bool is_process_running_on_port(int port, const char* process_name) {
   return false;
 }
 
+int* get_zombie_ports(int *nb) {
+  int* ports_running = (int *) malloc(10 * sizeof(int));
+  int num_ports_running = 0;
+
+  printf("Ports running '%s':\n", PROCESS);
+
+  for (int i = 0; i < 10; i++) {
+    if (is_process_running_on_port(PORTS[i])) {
+      printf("%d\n", PORTS[i]);
+      ports_running[num_ports_running] = PORTS[i];
+
+      num_ports_running++;
+    }
+  }
+
+  *nb = num_ports_running;
+  return ports_running;
+}
+
 int main(int argc, char *argv[]) {
   char* hostname = argv[1];
   if (hostname == NULL) {
@@ -36,20 +56,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int ports[10] = { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009 }; // example array of ports to check
-  const char* process_name = "zombie"; // example process name to search for
-  int ports_running[10];
-  int num_ports_running = 0;
-
-  printf("Ports running '%s':\n", process_name);
-
-  for (int i = 0; i < 10; i++) {
-    if (is_process_running_on_port(ports[i], process_name)) {
-      printf("%d\n", ports[i]);
-      ports_running[num_ports_running] = ports[i];
-      num_ports_running++;
-    }
-  }
+  int num_ports_running;
+  int *ports_running = get_zombie_ports(&num_ports_running);
 
   int** ports_sockets = (int**) malloc(num_ports_running * sizeof(int*));
 
@@ -59,7 +67,6 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < num_ports_running; i++) {
     int sockfd = ssocket();
-
     sconnect(hostname, ports_running[i], sockfd);
 
     ports_sockets[i][0] = ports_running[i];

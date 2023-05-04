@@ -16,10 +16,8 @@ void createZombie() {
 
   pid_t pid = sfork();
 
-  // PA PAPA
   if (pid == 0) {
-    sexecl("./zombie", "./zombie", port);
-  // PAPA
+    sexecl("./zombie", "./zombie", port, NULL);
   } else { 
     printf("Zombie process created with PID %d\n", pid);
   }
@@ -30,7 +28,7 @@ int main() {
     createZombie();
   }
 
-  sexecl("./controller", "./controller", "127.0.0.1"); 
+  sexecl("./controller", "./controller", "127.0.0.1", NULL); 
 
   return 0;
 }

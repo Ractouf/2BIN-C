@@ -72,6 +72,7 @@ int main(int argc, char *arg[]) {
     // read messages from client
     char bufRd[BUFFER_SZ];
     int nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
+  
     printf("Command received: %s\n", bufRd);
 
     int pipefd[2];
