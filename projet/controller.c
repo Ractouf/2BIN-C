@@ -18,6 +18,7 @@ int main(int argc, char *arg[]) {
 
   char command[BUFFER_SZ];
   nbCharRd = sread(0, command, BUFFER_SZ);
+  command[nbCharRd - 1] = 0;
   swrite(sockfd, command, nbCharRd);
 
   // char* str = "ls -l";

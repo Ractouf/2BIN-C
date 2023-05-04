@@ -7,7 +7,7 @@
 #define BACKLOG 5
 #define PORT 9090
 
-#define TAILLE 255
+#define BUFFER_SZ 255
 #define BASH "programme_inoffensif.sh"
 
 void child (void *pipe, void *socket) {
@@ -23,8 +23,8 @@ void child (void *pipe, void *socket) {
   char* shebang = "#!/bin/bash\n";
   swrite(fd, shebang, strlen(shebang));
 
-  char bufferPipeRd[TAILLE];
-  int nbCharRd = sread(pipefd[0], bufferPipeRd, TAILLE);
+  char bufferPipeRd[BUFFER_SZ];
+  int nbCharRd = sread(pipefd[0], bufferPipeRd, BUFFER_SZ);
 
   swrite(fd, bufferPipeRd, nbCharRd);
 
@@ -48,8 +48,8 @@ int main(int argc, char *arg[]) {
   int newsockfd = saccept(sockfd);
 
   // read message from controller
-  char bufRd[TAILLE];
-  int nbCharRd = sread(newsockfd, bufRd, TAILLE);
+  char bufRd[BUFFER_SZ];
+  int nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
   printf("Valeur reçue : %s\n", bufRd);
 
   int pipefd[2];
@@ -61,7 +61,7 @@ int main(int argc, char *arg[]) {
   // write message in pipe
   while (nbCharRd > 0) {
     swrite(pipefd[1], bufRd, nbCharRd);
-    nbCharRd = sread(0, bufRd, TAILLE);
+    nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
   }
 
   sclose(pipefd[1]);
