@@ -3,6 +3,6 @@
 
 #define NBR_PORTS 10
 
-const unsigned short PORTS[NBR_PORTS] = { 5000, 5001, 5002, 5003, 5004, 5005,5006, 5007, 5008, 5009 };
+const unsigned short PORTS[NBR_PORTS] = { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009 };
 
 #endif

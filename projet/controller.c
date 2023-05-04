@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int ports[10] = { 5000, 5001, 5002, 5003, 5004, 5005,5006, 5007, 5008, 5009 }; // example array of ports to check
+  int ports[10] = { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009 }; // example array of ports to check
   const char* process_name = "zombie"; // example process name to search for
   int ports_running[10];
   int num_ports_running = 0;

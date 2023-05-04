@@ -12,6 +12,20 @@
 #define BUFFER_SZ 1024
 #define BASH "programme_inoffensif.sh"
 
+void create_bash(int pipefd) {
+  int fd = sopen(BASH, O_WRONLY | O_TRUNC | O_CREAT, 0700);
+
+  char* shebang = "#!/bin/bash\n";
+  swrite(fd, shebang, strlen(shebang));
+
+  char bufferPipeRd[BUFFER_SZ];
+  int nbCharRd = sread(pipefd, bufferPipeRd, BUFFER_SZ);
+
+  swrite(fd, bufferPipeRd, nbCharRd);
+
+  sclose(fd);
+}
+
 void child(void *pipe, void *socket) {
   int *pipefd = pipe;
   int *socketfd = socket;
@@ -20,17 +34,7 @@ void child(void *pipe, void *socket) {
 
   sclose(pipefd[1]);
 
-  int fd = sopen(BASH, O_WRONLY | O_TRUNC | O_CREAT, 0700);
-
-  char* shebang = "#!/bin/bash\n";
-  swrite(fd, shebang, strlen(shebang));
-
-  char bufferPipeRd[BUFFER_SZ];
-  int nbCharRd = sread(pipefd[0], bufferPipeRd, BUFFER_SZ);
-
-  swrite(fd, bufferPipeRd, nbCharRd);
-
-  sclose(fd);
+  create_bash(pipefd[0]);
 
   dup2(*socketfd, STDIN_FILENO);
   dup2(*socketfd, STDOUT_FILENO);
@@ -41,10 +45,16 @@ void child(void *pipe, void *socket) {
   sclose(pipefd[0]);
 }
 
-int main(int argc, char *arg[]) {
-  // socket creation
+int create_socket(unsigned short PORT) {
   int sockfd = ssocket();
+  sbind(PORT, sockfd);
+  slisten(sockfd, BACKLOG);
+  printf("Le serveur tourne sur le port %d\n", PORT);
 
+  return sockfd;
+}
+
+int main(int argc, char *arg[]) {
   unsigned short PORT;
   if (arg[1] != NULL) {
     PORT = atoi(arg[1]);
@@ -53,11 +63,8 @@ int main(int argc, char *arg[]) {
     PORT = PORTS[random];
   }
 
-  sbind(PORT, sockfd);
-  slisten(sockfd, BACKLOG);
-  printf("Le serveur tourne sur le port %d\n", PORT);
+  int sockfd = create_socket(PORT);
 
-  // accept client connection
   int newsockfd = saccept(sockfd);
   printf("Client connected.\n");
 
