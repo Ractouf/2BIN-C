@@ -1,4 +1,4 @@
-CFLAGS=-std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
+CFLAGS=-g -std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
 
 all: zombie controller
 

