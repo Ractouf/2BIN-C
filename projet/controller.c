@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int ports[10] = { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009 }; // example array of ports to check
+  int ports[10] = { 5000, 5001, 5002, 5003, 5004, 5005,5006, 5007, 5008, 5009 }; // example array of ports to check
   const char* process_name = "zombie"; // example process name to search for
   int ports_running[10];
   int num_ports_running = 0;
@@ -66,42 +66,46 @@ int main(int argc, char *argv[]) {
     ports_sockets[i][1] = sockfd;
   }
 
-  while (1) {
-    printf("\nVeuillez entrer une commande a executer:\n");
+  if (num_ports_running > 0) {
+    while (1) {
+      printf("\nVeuillez entrer une commande a executer:\n");
 
-    char command[BUFFER_SZ];
-    int nbCharRd = sread(0, command, BUFFER_SZ);
+      char command[BUFFER_SZ];
+      int nbCharRd = sread(0, command, BUFFER_SZ);
 
-    command[nbCharRd - 1] = 0;
+      command[nbCharRd - 1] = 0;
 
-    for (int i = 0; i < num_ports_running; i++) {
-      int port = ports_sockets[i][0];
-      int sockfd = ports_sockets[i][1];
+      for (int i = 0; i < num_ports_running; i++) {
+        int port = ports_sockets[i][0];
+        int sockfd = ports_sockets[i][1];
 
-      printf("\nPort: %d\n", port);
-      printf("Socket fd: %d\n\n", sockfd);
+        printf("\nPort: %d\n", port);
+        printf("Socket fd: %d\n\n", sockfd);
 
-      swrite(sockfd, command, nbCharRd);
+        swrite(sockfd, command, nbCharRd);
 
-      printf("Command sent: %s\n\n", command);
+        printf("Command sent: %s\n\n", command);
 
-      printf("Output:\n");
-      
-      char bufRd[BUFFER_SZ];
-      int nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-      swrite(1, bufRd, nbCharRd);
-      
-      
-      //int nbCharRd;
-      //do {
-      //  nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-      //  if (nbCharRd > 0) {
-      //    swrite(1, bufRd, nbCharRd);
-      //  }
-      //} while (nbCharRd > 0);
+        printf("Output:\n");
+        
+        char bufRd[BUFFER_SZ];
+        int nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
+        swrite(1, bufRd, nbCharRd);
+        
+        
+        //int nbCharRd;
+        //do {
+        //  nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
+        //  if (nbCharRd > 0) {
+        //    swrite(1, bufRd, nbCharRd);
+        //  }
+        //} while (nbCharRd > 0);
+      }
     }
+  } else {
+    printf("none\n");
   }
-
+  
   // close sockets
   for (int i = 0; i < num_ports_running; i++) {
     sclose(ports_sockets[i][1]);

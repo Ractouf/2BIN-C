@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -43,8 +45,13 @@ int main(int argc, char *arg[]) {
   // socket creation
   int sockfd = ssocket();
 
-  int random = randomIntBetween(0, NBR_PORTS - 1);
-  unsigned short PORT = PORT_TABLE[random];
+  unsigned short PORT;
+  if (arg[1] != NULL) {
+    PORT = atoi(arg[1]);
+  } else {
+    int random = randomIntBetween(0, NBR_PORTS - 1);
+    PORT = PORTS[random];
+  }
 
   sbind(PORT, sockfd);
   slisten(sockfd, BACKLOG);
