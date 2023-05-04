@@ -1,0 +1,15 @@
+total 144
+-rwxr-xr-x 1 francoisvandeputte francoisvandeputte 32624 May  4 11:52 controller
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte   476 May  4 11:52 controller.c
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte     0 May  4 10:13 controller.h
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte  1968 May  4 11:52 controller.o
+-rwx------ 1 francoisvandeputte francoisvandeputte     0 May  4 13:21 logfile.txt
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte   556 May  4 10:37 makefile
+-rwx------ 1 francoisvandeputte francoisvandeputte    17 May  4 13:21 programme_inoffensif.sh
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte 13544 Apr 24 07:25 utils_v2.c
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte 15938 Apr 24 07:25 utils_v2.h
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte 19568 May  4 11:38 utils_v2.o
+-rwxr-xr-x 1 francoisvandeputte francoisvandeputte 36784 May  4 13:20 zombie
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte  1527 May  4 13:20 zombie.c
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte     0 May  4 10:13 zombie.h
+-rw-r--r-- 1 francoisvandeputte francoisvandeputte  3848 May  4 13:20 zombie.o
