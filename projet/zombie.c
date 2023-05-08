@@ -12,37 +12,21 @@
 #define BUFFER_SZ 1024
 #define BASH "programme_inoffensif.sh"
 
-void create_bash(int pipefd) {
-  int fd = sopen(BASH, O_WRONLY | O_TRUNC | O_CREAT, 0700);
+void child(void *newsockfd) {
+  int *socketfd = newsockfd;
 
-  char* shebang = "#!/bin/bash\n";
-  swrite(fd, shebang, strlen(shebang));
-
-  char bufferPipeRd[BUFFER_SZ];
-  int nbCharRd = sread(pipefd, bufferPipeRd, BUFFER_SZ);
-
-  swrite(fd, bufferPipeRd, nbCharRd);
-
-  sclose(fd);
-}
-
-void child(void *pipe, void *socket) {
-  int *pipefd = pipe;
-  int *socketfd = socket;
+  // read messages from client
+  char bufRd[BUFFER_SZ];
+  sread(*socketfd, bufRd, BUFFER_SZ);
+  printf("Command received: %s\n", bufRd);
 
   // printf("%ls", socketfd);
-
-  sclose(pipefd[1]);
-
-  create_bash(pipefd[0]);
 
   dup2(*socketfd, STDIN_FILENO);
   dup2(*socketfd, STDOUT_FILENO);
   dup2(*socketfd, STDERR_FILENO);
 
-  sexecl("./" BASH, BASH, NULL);
-
-  sclose(pipefd[0]);
+  sexecl("/bin/bash", BASH, NULL);
 }
 
 int create_socket(unsigned short PORT) {
@@ -65,31 +49,16 @@ int main(int argc, char *arg[]) {
 
   int sockfd = create_socket(PORT);
 
-  int newsockfd = saccept(sockfd);
-  printf("Client connected.\n");
-
   while (1) {
-    // read messages from client
-    char bufRd[BUFFER_SZ];
-    int nbCharRd = sread(newsockfd, bufRd, BUFFER_SZ);
-  
-    printf("Command received: %s\n", bufRd);
+    int newsockfd = saccept(sockfd);
+    printf("Client connected.\n");
 
-    int pipefd[2];
-    spipe(pipefd);
-
-    fork_and_run2(child, pipefd, &newsockfd);
-
-    sclose(pipefd[0]);
-
-    swrite(pipefd[1], bufRd, nbCharRd);
-
-    sclose(pipefd[1]);
+    fork_and_run1(child, &newsockfd);
   }
 
   // close connection to client
-  sclose(newsockfd);
-  printf("Client disconnected.\n");
+  // sclose(newsockfd);
+  //printf("Client disconnected.\n");
 
   // close listen socket
   sclose(sockfd);
