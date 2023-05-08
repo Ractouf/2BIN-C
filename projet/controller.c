@@ -80,8 +80,6 @@ int main(int argc, char *argv[]) {
       char command[BUFFER_SZ];
       int nbCharRd = sread(0, command, BUFFER_SZ);
 
-      command[nbCharRd - 1] = 0;
-
       for (int i = 0; i < num_ports_running; i++) {
         int port = ports_sockets[i][0];
         int sockfd = ports_sockets[i][1];
@@ -89,24 +87,10 @@ int main(int argc, char *argv[]) {
         printf("\nPort: %d\n", port);
         printf("Socket fd: %d\n\n", sockfd);
 
+        printf("Command sent: %s\n", command);
         swrite(sockfd, command, nbCharRd);
 
-        printf("Command sent: %s\n\n", command);
-
         printf("Output:\n");
-        
-        char bufRd[BUFFER_SZ];
-        int nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-        swrite(1, bufRd, nbCharRd);
-        
-        
-        //int nbCharRd;
-        //do {
-        //  nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-        //  if (nbCharRd > 0) {
-        //    swrite(1, bufRd, nbCharRd);
-        //  }
-        //} while (nbCharRd > 0);
       }
     }
   } else {

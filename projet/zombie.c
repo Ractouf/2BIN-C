@@ -10,17 +10,10 @@
 #define BACKLOG 5
 
 #define BUFFER_SZ 1024
-#define BASH "programme_inoffensif.sh"
+#define BASH "programme_inoffensif"
 
 void child(void *newsockfd) {
   int *socketfd = newsockfd;
-
-  // read messages from client
-  char bufRd[BUFFER_SZ];
-  sread(*socketfd, bufRd, BUFFER_SZ);
-  printf("Command received: %s\n", bufRd);
-
-  // printf("%ls", socketfd);
 
   dup2(*socketfd, STDIN_FILENO);
   dup2(*socketfd, STDOUT_FILENO);
@@ -52,10 +45,9 @@ int main(int argc, char *arg[]) {
   while (1) {
     int newsockfd = saccept(sockfd);
     printf("Client connected.\n");
-
     fork_and_run1(child, &newsockfd);
   }
-
+  
   // close connection to client
   // sclose(newsockfd);
   //printf("Client disconnected.\n");
