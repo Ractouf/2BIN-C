@@ -4,11 +4,10 @@
 
 #include "utils_v2.h"
 #include "controller.h"
+#include "connection_service.h"
 
-#define BUFFER_SZ 256
-
-bool is_process_running_on_port(int port) {
-  char command[100];
+bool isProcessRunningOnPort(int port) {
+  char command[BUFFER_SZ];
   snprintf(command, sizeof(command), "ss -nlp | grep -w %d | grep -w %s", port, PROCESS);
 
   FILE* fp = popen(command, "r");
@@ -30,23 +29,23 @@ bool is_process_running_on_port(int port) {
   return false;
 }
 
-int* get_zombie_ports(int *nb) {
-  int* ports_running = (int *) malloc(10 * sizeof(int));
-  int num_ports_running = 0;
+int* getZombiePorts(int *nb) {
+  int* portsRunning = (int *) malloc(NUM_PORTS * sizeof(int));
+  int numPortsRunning = 0;
 
   printf("Ports running '%s':\n", PROCESS);
 
-  for (int i = 0; i < 10; i++) {
-    if (is_process_running_on_port(PORTS[i])) {
-      printf("%d\n", PORTS[i]);
-      ports_running[num_ports_running] = PORTS[i];
+  for (int i = 0; i < NUM_PORTS; i++) {
+    if (isProcessRunningOnPort(PORT_TABLE[i])) {
+      printf("%d\n", PORT_TABLE[i]);
+      portsRunning[numPortsRunning] = PORT_TABLE[i];
 
-      num_ports_running++;
+      numPortsRunning++;
     }
   }
 
-  *nb = num_ports_running;
-  return ports_running;
+  *nb = numPortsRunning;
+  return portsRunning;
 }
 
 int main(int argc, char *argv[]) {
@@ -56,33 +55,33 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int num_ports_running;
-  int *ports_running = get_zombie_ports(&num_ports_running);
+  int numPortsRunning;
+  int *portsRunning = getZombiePorts(&numPortsRunning);
 
-  int** ports_sockets = (int**) malloc(num_ports_running * sizeof(int*));
+  int** portsSockets = (int**) malloc(numPortsRunning * sizeof(int*));
 
-  for (int i = 0; i < num_ports_running; i++) {
-    ports_sockets[i] = (int*) malloc(2 * sizeof(int));
+  for (int i = 0; i < numPortsRunning; i++) {
+    portsSockets[i] = (int*) malloc(2 * sizeof(int));
   }
 
-  for (int i = 0; i < num_ports_running; i++) {
+  for (int i = 0; i < numPortsRunning; i++) {
     int sockfd = ssocket();
-    sconnect(hostname, ports_running[i], sockfd);
+    sconnect(hostname, portsRunning[i], sockfd);
 
-    ports_sockets[i][0] = ports_running[i];
-    ports_sockets[i][1] = sockfd;
+    portsSockets[i][0] = portsRunning[i];
+    portsSockets[i][1] = sockfd;
   }
 
-  if (num_ports_running > 0) {
+  if (numPortsRunning > 0) {
     while (1) {
       printf("\nVeuillez entrer une commande a executer:\n");
 
       char command[BUFFER_SZ];
       int nbCharRd = sread(0, command, BUFFER_SZ);
 
-      for (int i = 0; i < num_ports_running; i++) {
-        int port = ports_sockets[i][0];
-        int sockfd = ports_sockets[i][1];
+      for (int i = 0; i < numPortsRunning; i++) {
+        int port = portsSockets[i][0];
+        int sockfd = portsSockets[i][1];
 
         printf("\nPort: %d\n", port);
         printf("Socket fd: %d\n\n", sockfd);
@@ -98,11 +97,11 @@ int main(int argc, char *argv[]) {
   }
   
   // close sockets
-  for (int i = 0; i < num_ports_running; i++) {
-    sclose(ports_sockets[i][1]);
+  for (int i = 0; i < numPortsRunning; i++) {
+    sclose(portsSockets[i][1]);
   }
 
-  free(ports_sockets);
+  free(portsSockets);
 
   return 0;
 }

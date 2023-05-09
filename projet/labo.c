@@ -4,12 +4,10 @@
 
 #include "utils_v2.h"
 
-#include "labo.h"
-
-#define BUFFER_SZ 255
+#include "connection_service.h"
 
 void createZombie() {
-  int random = PORTS[randomIntBetween(0, NBR_PORTS - 1)];
+  int random = PORT_TABLE[randomIntBetween(0, NUM_PORTS - 1)];
 
   char port[6];
   sprintf(port, "%d", random);

