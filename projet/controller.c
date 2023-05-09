@@ -47,6 +47,14 @@ int* getZombiePorts(int *nb) {
   return portsRunning;
 }
 
+void child(void *socketfd) {
+  int sockfd = *(int*) socketfd;
+
+  char bufRd[BUFFER_SZ];
+  int nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
+  swrite(1, bufRd, nbCharRd);
+}
+
 int main(int argc, char *argv[]) {
   char* hostname = argv[1];
   if (hostname == NULL) {
@@ -85,15 +93,14 @@ int main(int argc, char *argv[]) {
         printf("\nPort: %d\n", port);
         printf("Socket fd: %d\n\n", sockfd);
 
-        printf("Command sent: %s\n", command);
         nwrite(sockfd, command, nbCharRd);
+        printf("Command sent: %s\n", command);
 
         printf("Output:\n");
 
-        char bufRd[BUFFER_SZ];
-        nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
-        swrite(1, bufRd, nbCharRd);
-        
+        fork_and_run1(child, &sockfd);
+        int status;
+        swait(&status);
         //while (nbCharRd > 0) {
          // swrite(1, bufRd, nbCharRd);
         //  nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
