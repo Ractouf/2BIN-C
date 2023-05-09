@@ -3,7 +3,6 @@
 #include <stdbool.h>
 
 #include "utils_v2.h"
-#include "controller.h"
 #include "connection_service.h"
 
 bool isProcessRunningOnPort(int port) {
@@ -30,7 +29,7 @@ bool isProcessRunningOnPort(int port) {
 }
 
 int* getZombiePorts(int *nb) {
-  int* portsRunning = (int *) malloc(NUM_PORTS * sizeof(int));
+  int* portsRunning = (int*) malloc(NUM_PORTS * sizeof(int));
   int numPortsRunning = 0;
 
   printf("Ports running '%s':\n", PROCESS);
@@ -87,9 +86,18 @@ int main(int argc, char *argv[]) {
         printf("Socket fd: %d\n\n", sockfd);
 
         printf("Command sent: %s\n", command);
-        swrite(sockfd, command, nbCharRd);
+        nwrite(sockfd, command, nbCharRd);
 
         printf("Output:\n");
+
+        char bufRd[BUFFER_SZ];
+        nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
+        swrite(1, bufRd, nbCharRd);
+        
+        //while (nbCharRd > 0) {
+         // swrite(1, bufRd, nbCharRd);
+        //  nbCharRd = sread(sockfd, bufRd, BUFFER_SZ);
+        //}
       }
     }
   } else {

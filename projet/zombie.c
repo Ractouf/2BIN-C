@@ -8,11 +8,13 @@
 #include "connection_service.h"
 
 void child(void *newsockfd) {
-  int *socketfd = newsockfd;
+  int socketfd = *(int*) newsockfd;
 
-  dup2(*socketfd, STDIN_FILENO);
-  dup2(*socketfd, STDOUT_FILENO);
-  dup2(*socketfd, STDERR_FILENO);
+  dup2(socketfd, STDIN_FILENO);
+  dup2(socketfd, STDOUT_FILENO);
+  dup2(socketfd, STDERR_FILENO);
+
+  sclose(socketfd);
 
   sexecl("/bin/bash", BASH, NULL);
 }

@@ -1,4 +1,4 @@
-CFLAGS=-g -std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
+CFLAGS=-std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
 
 all: zombie controller labo
 
@@ -6,25 +6,25 @@ all: zombie controller labo
 zombie : zombie.o utils_v2.o
 	gcc $(CFLAGS) -o zombie zombie.o utils_v2.o
 
-zombie.o : zombie.c connection_service.h utils_v2.h 
+zombie.o : zombie.c connection_service.h utils_v2.h
 	gcc $(CFLAGS) -c zombie.c
 
 # Controller
 controller : controller.o utils_v2.o
 	gcc $(CFLAGS) -o controller controller.o utils_v2.o
 
-controller.o : controller.c controller.h connection_service.h utils_v2.h 
+controller.o : controller.c connection_service.h utils_v2.h
 	gcc $(CFLAGS) -c controller.c
 
 # Labo
 labo : labo.o utils_v2.o
 	gcc $(CFLAGS) -o labo labo.o utils_v2.o
 
-labo.o : labo.c connection_service.h utils_v2.h 
+labo.o : labo.c utils_v2.h
 	gcc $(CFLAGS) -c labo.c
 
 # Utils
-utils_v2.o : utils_v2.c utils_v2.h
+utils_v2.o : utils_v2.c connection_service.h utils_v2.h
 	cc $(CFLAGS) -c utils_v2.c
 
 # Clean
