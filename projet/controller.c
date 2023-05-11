@@ -6,31 +6,48 @@
 #include "utils_v2.h"
 #include "connection_service.h"
 
+struct IpPortFd {
+  char ip[16];
+  int port;
+  int fd;
+};
+
 int main(int argc, char *argv[]) {
-  char* hostname = argv[1];
-  if (hostname == NULL) {
-    printf("Please provide a hostname\n");
-    return 1;
+  if (argc < 2) {
+    printf("Usage: %s <...hostnames>\n", argv[0]);
+    exit(1);
+  }
+  
+  char** hostnames = (char**) malloc((argc - 1) * sizeof(char*));
+  for (int i = 1; i < argc; i++) {
+    hostnames[i - 1] = argv[i];
+    printf("%s\n", hostnames[i - 1]);
   }
 
-  int portsRunning[NUM_PORTS];
-  int numPortsRunning = getZombiePorts(&portsRunning);
+  struct IpPortFd *ipPortFd = (struct IpPortFd*) malloc(((argc - 1) * NUM_PORTS) * sizeof(struct IpPortFd));
+  int nbConnections = 0;
 
-  int** portsSockets = (int**) malloc(numPortsRunning * sizeof(int*));
+  for (int i = 0; i < argc - 1; i++) {
+    for (int j = 0; j < NUM_PORTS; j++) {
+      int sockfd = ssocket();
+      
+      int response = sconnect(hostnames[i], PORT_TABLE[j], sockfd);
+      
+      if (!response) {
+        strcpy(ipPortFd[nbConnections].ip, hostnames[i]);
+        ipPortFd[nbConnections].port = PORT_TABLE[j];
+        ipPortFd[nbConnections].fd = sockfd;
 
-  for (int i = 0; i < numPortsRunning; i++) {
-    portsSockets[i] = (int*) malloc(2 * sizeof(int));
+        nbConnections ++;
+      }
+    }
   }
 
-  for (int i = 0; i < numPortsRunning; i++) {
-    int sockfd = ssocket();
-    sconnect(hostname, portsRunning[i], sockfd);
-
-    portsSockets[i][0] = portsRunning[i];
-    portsSockets[i][1] = sockfd;
+  for (int i = 0; i < nbConnections; i++) {
+    printf("%s, %d, %d\n", ipPortFd[i].ip, ipPortFd[i].port, ipPortFd[i].fd);
   }
 
-  if (numPortsRunning > 0) {
+  if (nbConnections > 0) {
     int childId = sfork();
 
     if (childId != 0) {
@@ -39,11 +56,12 @@ int main(int argc, char *argv[]) {
         char command[BUFFER_SZ];
         int nbCharRd = sread(0, command, BUFFER_SZ);
 
-        for (int i = 0; i < numPortsRunning; i++) {
-          int port = portsSockets[i][0];
-          int sockfd = portsSockets[i][1];
+        for (int i = 0; i < nbConnections; i++) {
+          char* ip = ipPortFd[i].ip;
+          int port = ipPortFd[i].port;
+          int sockfd = ipPortFd[i].fd;
 
-          printf("\nPort: %d\n\n", port);
+          printf("\n%s:%d\n\n", ip, port);
 
           nwrite(sockfd, command, nbCharRd);
         }
@@ -53,18 +71,18 @@ int main(int argc, char *argv[]) {
       struct pollfd fds[NUM_PORTS];
       int timeout = 10;
 
-      for (int i = 0; i < numPortsRunning; i++) {
-        int sockfd = portsSockets[i][1];
+      for (int i = 0; i < nbConnections; i++) {
+        int sockfd = ipPortFd[i].fd;
 
         fds[i].fd = sockfd;
         fds[i].events = POLLIN;
       }
 
       while (1) {
-        int ret = spoll(fds, numPortsRunning, timeout);
+        int ret = spoll(fds, nbConnections, timeout);
 
         if (ret > 0) {
-          for (int i = 0; i < numPortsRunning; i++) {
+          for (int i = 0; i < nbConnections; i++) {
             if (fds[i].revents & POLLIN) {
               char bufRd[BUFFER_SZ];
               int nbCharRd = sread(fds[i].fd, bufRd, BUFFER_SZ);
@@ -80,11 +98,12 @@ int main(int argc, char *argv[]) {
   }
 
   // close sockets
-  for (int i = 0; i < numPortsRunning; i++) {
-    sclose(portsSockets[i][1]);
+  for (int i = 0; i < nbConnections; i++) {
+    sclose(ipPortFd[i].fd);
   }
 
-  free(portsSockets);
+  free(ipPortFd);
+  free(hostnames);
 
   return 0;
 }

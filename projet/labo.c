@@ -30,3 +30,10 @@ int main() {
 
   return 0;
 }
+
+/*
+ctrl D -> kill zombies et enfants
+
+accept et pas saccept
+si ret -1 -> kill les bash car signal
+*/

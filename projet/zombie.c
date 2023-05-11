@@ -20,7 +20,7 @@ void child(void *newsockfd) {
 }
 
 int main(int argc, char *arg[]) {
-  unsigned short PORT;
+  int PORT;
   if (arg[1] != NULL) {
     PORT = atoi(arg[1]);
   } else {
