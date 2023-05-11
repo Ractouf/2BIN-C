@@ -19,15 +19,6 @@ void child(void *newsockfd) {
   sexecl("/bin/bash", BASH, NULL);
 }
 
-int createSocket(unsigned short PORT) {
-  int sockfd = ssocket();
-  sbind(PORT, sockfd);
-  slisten(sockfd, BACKLOG);
-  printf("Le serveur tourne sur le port %d\n", PORT);
-
-  return sockfd;
-}
-
 int main(int argc, char *arg[]) {
   unsigned short PORT;
   if (arg[1] != NULL) {

@@ -1,5 +1,4 @@
 #include <string.h>
-#include <stdlib.h>
 
 #include "utils_v2.h"
 #include "connection_service.h"
@@ -11,25 +10,6 @@ int createSocket(unsigned short PORT) {
   printf("Le serveur tourne sur le port %d\n", PORT);
 
   return sockfd;
-}
-
-int* getZombiePorts(int *nb) {
-  int* portsRunning = (int*) malloc(NUM_PORTS * sizeof(int));
-  int numPortsRunning = 0;
-
-  printf("Ports running '%s':\n", PROCESS);
-
-  for (int i = 0; i < NUM_PORTS; i++) {
-    if (isProcessRunningOnPort(PORT_TABLE[i])) {
-      printf("%d\n", PORT_TABLE[i]);
-      portsRunning[numPortsRunning] = PORT_TABLE[i];
-
-      numPortsRunning++;
-    }
-  }
-
-  *nb = numPortsRunning;
-  return portsRunning;
 }
 
 bool isProcessRunningOnPort(int port) {
@@ -53,4 +33,20 @@ bool isProcessRunningOnPort(int port) {
   pclose(fp);
 
   return false;
+}
+
+int getZombiePorts(int (*running)[NUM_PORTS]) {
+  int numPortsRunning = 0;
+
+  printf("Ports running '%s':\n", PROCESS);
+
+  for (int i = 0; i < NUM_PORTS; i++) {
+    if (isProcessRunningOnPort(PORT_TABLE[i])) {
+      printf("%d\n", PORT_TABLE[i]);
+      (*running)[numPortsRunning] = PORT_TABLE[i];
+      numPortsRunning++;
+    }
+  }
+
+  return numPortsRunning;
 }

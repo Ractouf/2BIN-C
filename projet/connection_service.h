@@ -8,15 +8,15 @@
 #define PROCESS "zombie"
 #define BASH "programme_inoffensif"
 
-const unsigned short PORT_TABLE[NUM_PORTS] = {
+static const unsigned short PORT_TABLE[NUM_PORTS] = {
     10000, 10001, 10002, 10003, 10004,
     10005, 10006, 10007, 10008, 10009
 };
 
-//int createSocket(unsigned short PORT);
+int createSocket(unsigned short PORT);
 
-//int* getZombiePorts(int *nb);
+int getZombiePorts(int (*running)[NUM_PORTS]);
 
-//bool isProcessRunningOnPort(int port);
+bool isProcessRunningOnPort(int port);
 
 #endif

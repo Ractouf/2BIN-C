@@ -6,48 +6,6 @@
 #include "utils_v2.h"
 #include "connection_service.h"
 
-bool isProcessRunningOnPort(int port) {
-  char command[BUFFER_SZ];
-  snprintf(command, sizeof(command), "ss -nlp | grep -w %d | grep -w %s", port, PROCESS);
-
-  FILE* fp = popen(command, "r");
-  if (fp == NULL) {
-    perror("Failed to execute command");
-    return false;
-  }
-
-  char buffer[BUFFER_SZ];
-  while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-    if (strstr(buffer, PROCESS) != NULL) {
-      pclose(fp);
-      return true;
-    }
-  }
-
-  pclose(fp);
-
-  return false;
-}
-
-int* getZombiePorts(int *nb) {
-  int* portsRunning = (int*) malloc(NUM_PORTS * sizeof(int));
-  int numPortsRunning = 0;
-
-  printf("Ports running '%s':\n", PROCESS);
-
-  for (int i = 0; i < NUM_PORTS; i++) {
-    if (isProcessRunningOnPort(PORT_TABLE[i])) {
-      printf("%d\n", PORT_TABLE[i]);
-      portsRunning[numPortsRunning] = PORT_TABLE[i];
-
-      numPortsRunning++;
-    }
-  }
-
-  *nb = numPortsRunning;
-  return portsRunning;
-}
-
 int main(int argc, char *argv[]) {
   char* hostname = argv[1];
   if (hostname == NULL) {
@@ -55,8 +13,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  int numPortsRunning;
-  int *portsRunning = getZombiePorts(&numPortsRunning);
+  int portsRunning[NUM_PORTS];
+  int numPortsRunning = getZombiePorts(&portsRunning);
 
   int** portsSockets = (int**) malloc(numPortsRunning * sizeof(int*));
 
