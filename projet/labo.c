@@ -26,7 +26,8 @@ int main() {
     createZombie();
   }
 
-  sexecl("./controller", "./controller", "127.0.0.1", NULL); 
+  char bufRd[BUFFER_SZ];
+  sread(1, bufRd, BUFFER_SZ);
 
   return 0;
 }

