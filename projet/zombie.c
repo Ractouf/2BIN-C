@@ -9,6 +9,9 @@
 #include "utils_v2.h"
 #include "connection_service.h"
 
+int childs_pid[100];
+int num_children = 0;
+
 void child(void *newsockfd) {
   int socketfd = *(int*) newsockfd;
 
@@ -21,8 +24,14 @@ void child(void *newsockfd) {
   sexecl("/bin/bash", BASH, NULL);
 }
 
-int main(int argc, char *arg[]) {
+void sigterm_handler(int sig) {
+  for (int i = 0; i < num_children; i++) {
+    kill(childs_pid[i], SIGTERM);
+  }
+  exit(0);
+}
 
+int main(int argc, char *arg[]) {
   int PORT;
   if (arg[1] != NULL) {
     PORT = atoi(arg[1]);
@@ -34,18 +43,29 @@ int main(int argc, char *arg[]) {
   int sockfd = createSocket(PORT);
 
   int newsockfd;
+
+  struct sigaction action = {0};
+  action.sa_handler = sigterm_handler;
+  sigaction(SIGTERM, &action, NULL);
   
   while(1) {
     newsockfd = accept(sockfd, NULL, NULL);
 
-    printf("newsockfd: %d\n", newsockfd);
-
     if (newsockfd == -1) {
-      // BUTER LES PTN D4ENFANTS venant du tableau de pid
-      exit(1);
-    } else if (newsockfd > 0) {
+      printf("newsockfd négatif\n");
+      break;
+    } else {
       printf("Client connected.\n");
-      fork_and_run1(child, &newsockfd);
+      int childId = fork_and_run1(child, &newsockfd);
+
+      if (childId > 0 && num_children < 100) {
+        childs_pid[num_children++] = childId;
+      }
     }
   }
+
+  sclose(newsockfd);
+  sclose(sockfd);
+
+  return 0;
 }
