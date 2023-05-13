@@ -29,12 +29,8 @@ int main() {
 
   for (int i = 0; i < 2; i++) {
     skill(zombie_pids[i], SIGKILL);
+    swaitpid(zombie_pids[i], NULL, 0);
   }
 
   return 0;
 }
-
-/*
-accept et pas saccept
-si ret -1 -> kill les bash car signal
-*/
