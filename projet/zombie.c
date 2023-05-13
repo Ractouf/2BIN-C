@@ -35,6 +35,8 @@ int main(int argc, char *arg[]) {
   while(1) {
     newsockfd = saccept(sockfd);
 
+    printf("%d, %d\n", newsockfd, sockfd);
+
     printf("Client connected.\n");
     fork_and_run1(child, &newsockfd);
   }
