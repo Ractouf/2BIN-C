@@ -28,7 +28,7 @@ int main() {
   }
 
   for (int i = 0; i < 2; i++) {
-    skill(zombie_pids[i], SIGKILL);
+    skill(zombie_pids[i], SIGTERM);
     swaitpid(zombie_pids[i], NULL, 0);
   }
 

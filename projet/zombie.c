@@ -3,6 +3,8 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #include "utils_v2.h"
 #include "connection_service.h"
@@ -20,6 +22,7 @@ void child(void *newsockfd) {
 }
 
 int main(int argc, char *arg[]) {
+
   int PORT;
   if (arg[1] != NULL) {
     PORT = atoi(arg[1]);
@@ -33,17 +36,16 @@ int main(int argc, char *arg[]) {
   int newsockfd;
   
   while(1) {
-    newsockfd = saccept(sockfd);
+    newsockfd = accept(sockfd, NULL, NULL);
 
-    printf("%d, %d\n", newsockfd, sockfd);
+    printf("newsockfd: %d\n", newsockfd);
 
-    printf("Client connected.\n");
-    fork_and_run1(child, &newsockfd);
+    if (newsockfd == -1) {
+      // BUTER LES PTN D4ENFANTS venant du tableau de pid
+      exit(1);
+    } else if (newsockfd > 0) {
+      printf("Client connected.\n");
+      fork_and_run1(child, &newsockfd);
+    }
   }
-
-  // close connection to client
-  sclose(newsockfd);
-
-  // close listen socket
-  sclose(sockfd);
 }

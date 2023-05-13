@@ -1,7 +1,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <poll.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 #include "utils_v2.h"
 #include "connection_service.h"
@@ -57,7 +60,17 @@ int main(int argc, char *argv[]) {
         int nbCharRd = sread(0, command, BUFFER_SZ);
 
         if (nbCharRd == 0) {
-          break;
+          for (int i = 0; i < nbConnections; i++) {
+            sclose(ipPortFd[i].fd);
+          }
+
+          free(ipPortFd);
+          free(hostnames);
+
+          skill(childId, SIGKILL);
+          swaitpid(childId, NULL, 0);
+
+          exit(0);
         }
 
         for (int i = 0; i < nbConnections; i++) {
@@ -87,6 +100,11 @@ int main(int argc, char *argv[]) {
               char bufRd[BUFFER_SZ];
               int nbCharRd = sread(fds[i].fd, bufRd, BUFFER_SZ);
 
+              if (nbCharRd == 0) {
+                skill(getppid(), SIGTERM);
+                break;
+              }
+
               swrite(1, bufRd, nbCharRd);
             }
           }
@@ -96,13 +114,6 @@ int main(int argc, char *argv[]) {
   } else {
     printf("none\n");
   }
-
-  for (int i = 0; i < nbConnections; i++) {
-    sclose(ipPortFd[i].fd);
-  }
-
-  free(ipPortFd);
-  free(hostnames);
 
   return 0;
 }
