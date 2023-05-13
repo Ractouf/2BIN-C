@@ -30,15 +30,17 @@ int main(int argc, char *arg[]) {
 
   int sockfd = createSocket(PORT);
 
-  while (1) {
-    int newsockfd = saccept(sockfd);
+  int newsockfd;
+  
+  while(1) {
+    newsockfd = saccept(sockfd);
+
     printf("Client connected.\n");
     fork_and_run1(child, &newsockfd);
   }
-  
+
   // close connection to client
-  // sclose(newsockfd);
-  //printf("Client disconnected.\n");
+  sclose(newsockfd);
 
   // close listen socket
   sclose(sockfd);

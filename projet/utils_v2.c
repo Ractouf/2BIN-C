@@ -534,7 +534,6 @@ int slisten(int sockfd, int backlog){
 
 int saccept(int sockfd) {
   int newsockfd = accept(sockfd, NULL,NULL); 
-  checkNeg(newsockfd, "accept failure");
 
   return newsockfd;
 }

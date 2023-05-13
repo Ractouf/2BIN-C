@@ -3,38 +3,38 @@
 #include <string.h>
 
 #include "utils_v2.h"
-
 #include "connection_service.h"
 
-void createZombie() {
-  int random = PORT_TABLE[randomIntBetween(0, NUM_PORTS - 1)];
-
-  char port[6];
-  sprintf(port, "%d", random);
-
-  pid_t pid = sfork();
-
-  if (pid == 0) {
-    sexecl("./zombie", "./zombie", port, NULL);
-  } else { 
-    printf("Zombie process created with PID %d\n", pid);
-  }
-}
+pid_t zombie_pids[2];
 
 int main() {
   for (int i = 0; i < 2; i++) {
-    createZombie();
+    int childId = sfork();
+    
+    if (childId != 0) {
+      // PAPA
+      zombie_pids[i] = childId;
+    } else {
+      // PA PAPA
+      sexecl("./zombie", "./zombie", NULL);
+    }
   }
 
   char bufRd[BUFFER_SZ];
-  sread(1, bufRd, BUFFER_SZ);
+  while (1) {
+    if ((sread(1, bufRd, BUFFER_SZ) == 0)) {
+      break;
+    }
+  }
+
+  for (int i = 0; i < 2; i++) {
+    skill(zombie_pids[i], SIGKILL);
+  }
 
   return 0;
 }
 
 /*
-ctrl D -> kill zombies et enfants
-
 accept et pas saccept
 si ret -1 -> kill les bash car signal
 */

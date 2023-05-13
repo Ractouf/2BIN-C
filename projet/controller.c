@@ -56,10 +56,14 @@ int main(int argc, char *argv[]) {
         char command[BUFFER_SZ];
         int nbCharRd = sread(0, command, BUFFER_SZ);
 
+        if (nbCharRd == 0) {
+          // TODO recieved ctrl + D -> close zombie child processes and controller
+        }
+
         for (int i = 0; i < nbConnections; i++) {
           int sockfd = ipPortFd[i].fd;
 
-          nwrite(sockfd, command, nbCharRd);
+          swrite(sockfd, command, nbCharRd);
         }
       }
     } else {
@@ -91,11 +95,6 @@ int main(int argc, char *argv[]) {
     }
   } else {
     printf("none\n");
-  }
-
-  // close sockets
-  for (int i = 0; i < nbConnections; i++) {
-    sclose(ipPortFd[i].fd);
   }
 
   free(ipPortFd);

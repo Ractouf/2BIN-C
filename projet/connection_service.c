@@ -7,7 +7,7 @@ int createSocket(int PORT) {
   int sockfd = ssocket();
   sbind(PORT, sockfd);
   slisten(sockfd, BACKLOG);
-  printf("Le serveur tourne sur le port %d\n", PORT);
+  printf("Le zombie tourne sur le port %d\n", PORT);
 
   return sockfd;
 }
