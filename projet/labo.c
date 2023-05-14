@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "utils_v2.h"
 #include "connection_service.h"
 
 pid_t zombie_pids[2];

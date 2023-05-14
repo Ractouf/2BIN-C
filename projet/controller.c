@@ -1,12 +1,9 @@
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <poll.h>
-#include <unistd.h>
-#include <sys/types.h>
+// Projet de LAS 2023
+// Auteurs: 
+//   - D'haeyere Corentin
+//   - Lapinski Damien
+//   - Vandeputte Francois
 
-#include "utils_v2.h"
 #include "connection_service.h"
 
 struct IpPortFd {
