@@ -1,6 +1,18 @@
 #ifndef _CONNECTION_SERVICE_H_
 #define _CONNECTION_SERVICE_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <stdbool.h>
+#include <poll.h>
+
+#include "utils_v2.h"
+
 #define SERVER_IP "127.0.0.1"
 #define NUM_PORTS 10
 #define BUFFER_SZ 1024
