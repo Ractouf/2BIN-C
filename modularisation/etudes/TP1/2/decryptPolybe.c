@@ -10,5 +10,7 @@ int main() {
 
 	printf("The decrypted line is : %s\n", line);
 
+	free(line);
+
 	exit(0);
 }

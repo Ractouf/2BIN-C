@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
-
 #include "crypt.h"
 
 static char* rot13(char* msg) {

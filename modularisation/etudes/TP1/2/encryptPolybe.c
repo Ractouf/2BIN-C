@@ -10,5 +10,7 @@ int main() {
 
 	printf("The crypted line is : %s\n", line);
 
+	free(line);
+
 	exit(0);
 }
