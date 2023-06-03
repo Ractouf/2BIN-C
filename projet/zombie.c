@@ -26,7 +26,7 @@ void child(void *newsockfd) {
 
 void sigterm_handler(int sig) {
   for (int i = 0; i < num_children; i++) {
-    kill(childs_pid[i], SIGTERM);
+    skill(childs_pid[i], SIGTERM);
   }
   exit(0);
 }
