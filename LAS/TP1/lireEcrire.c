@@ -9,12 +9,12 @@
 
 #include "utils_v2.h"
 
-#define TAILLE 80
+#define TAILLE 10
 
 int main (int argc, char **argv) {
 	checkCond(argc != 3, "Incorrect amount of arguments\n");
 	
-	char bufRd[TAILLE]; 
+	char bufRd[TAILLE + 1]; 
 
 	/* Opening the file in write mode */
 	int fd1 = sopen(argv[1], O_WRONLY | O_TRUNC | O_CREAT, 0644);
@@ -26,16 +26,23 @@ int main (int argc, char **argv) {
 	swrite(1, msg, len);
 
 	/* Reading STDIN, then writing file, up to EOF (Ctrl-D) */
-	int nbCharRd = sread(0, bufRd, TAILLE);
+	int nbCharRd;
 
-	while (nbCharRd > 0) {
-	    if (isupper(bufRd[0])) {
-	        swrite(fd2, bufRd, nbCharRd);
-	    } else {
-	        swrite(fd1, bufRd, nbCharRd);
-	    }
+	while ((nbCharRd = sread(0, bufRd, TAILLE + 1))) {
 
-		nbCharRd = sread(0, bufRd, TAILLE);
+		if (bufRd[nbCharRd - 1] == '\n') {
+			bufRd[nbCharRd] = '\0';
+
+			if (isupper(bufRd[0])) {
+		        swrite(fd2, bufRd, nbCharRd);
+		    } else {
+		        swrite(fd1, bufRd, nbCharRd);
+		    }
+		} else {
+			char c;
+
+			while ((sread(0, &c, 1)) && (c != '\n'));
+		}
 	}
 
   /* Closing fd */

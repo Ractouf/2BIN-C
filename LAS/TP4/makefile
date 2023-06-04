@@ -1,17 +1,18 @@
 CFLAGS=-std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
 
-# Schtroumph
-schtroumph : maev.o utils_v2.o
-	gcc $(CFLAGS) -o schtroumph maev.o utils_v2.o
+all: b
 
-maev.o : maev.c utils_v2.o 
-	gcc $(CFLAGS) -c maev.c
+b: b.o utils_v2.o 
+	cc $(CFLAGS) -o b b.o utils_v2.o
+
+b.o: b.c utils_v2.h
+	cc $(CFLAGS) -c b.c
 
 # Utils
-utils_v2.o : utils_v2.c utils_v2.h
+utils_v2.o: utils_v2.c utils_v2.h
 	cc $(CFLAGS) -c utils_v2.c
 
 # Clean
-clean :
+clean:
 	rm *.o
-	rm schtroumph
+	rm b

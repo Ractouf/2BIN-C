@@ -1,13 +1,16 @@
 CFLAGS=-std=c11 -pedantic -Wvla -Werror -Wall -D_DEFAULT_SOURCE
 
-# Biblio
-schtroumph : createInscriptionRequests.o
-	gcc $(CFLAGS) -o schtroumph createInscriptionRequests.o
+all: antoin
 
-createInscriptionRequests.o : createInscriptionRequests.c inscriptionRequest.h 
-	gcc $(CFLAGS) -c createInscriptionRequests.c
+antoin: antoin.o utils_v2.o
+	cc $(CFLAGS) -o antoin antoin.o utils_v2.o
 
-# Clean
-clean :
+antoin.o: antoin.c
+	cc $(CFLAGS) -c antoin.c
+
+utils_v2.o: utils_v2.c utils_v2.h
+	cc $(CFLAGS) -c utils_v2.c
+
+clean:
+	rm antoin
 	rm *.o
-	rm schtroumph

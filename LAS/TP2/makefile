@@ -9,4 +9,9 @@ damien.o: damien.c
 	cc $(CFLAGS) -c damien.c
 
 utils_v2.o: utils_v2.c utils_v2.h
-	cc $ (CFLAGS) -c utils_v2.c
+	cc $(CFLAGS) -c utils_v2.c
+
+clean:
+	rm damien
+	rm *.o
+	
